@@ -1,2 +1,4 @@
 .env
 homework2/secret.env
+homework2/__pycache__/weather.cpython-39.pyc
+homework2/__pycache__/Constants.cpython-39.pyc
