@@ -1,0 +1,314 @@
+{
+	"info": {
+		"_postman_id": "870b4005-2f22-4a56-8c99-fddf3eaa8621",
+		"name": "Systemy-rozproszone-lab2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33646914"
+	},
+	"item": [
+		{
+			"name": "Valid example 200",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "city",
+							"value": "London",
+							"type": "text"
+						},
+						{
+							"key": "start_date",
+							"value": "2024-01-15",
+							"type": "text"
+						},
+						{
+							"key": "end_date",
+							"value": "2024-01-17",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "ex1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/weather",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"weather"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "City Parameter is required 400",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "city",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "start_date",
+							"value": "2024-03-15",
+							"type": "text"
+						},
+						{
+							"key": "end_date",
+							"value": "2024-03-17",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "ex1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/weather",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"weather"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Given city not found 404",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "city",
+							"value": "evfbbghn",
+							"type": "text"
+						},
+						{
+							"key": "start_date",
+							"value": "2024-03-15",
+							"type": "text"
+						},
+						{
+							"key": "end_date",
+							"value": "2024-03-17",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "ex1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/weather",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"weather"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid date format - date from the future 400",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "city",
+							"value": "London",
+							"type": "text"
+						},
+						{
+							"key": "start_date",
+							"value": "2024-01-13",
+							"type": "text"
+						},
+						{
+							"key": "end_date",
+							"value": "2024-05-13",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "ex1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/weather",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"weather"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Start date later than end date 400",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "city",
+							"value": "Kraków",
+							"type": "text"
+						},
+						{
+							"key": "start_date",
+							"value": "2024-03-15",
+							"type": "text"
+						},
+						{
+							"key": "end_date",
+							"value": "2024-03-13",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "ex1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/weather",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"weather"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "unauthorized - not valid password 401",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "city",
+							"value": "Kraków",
+							"type": "text"
+						},
+						{
+							"key": "start_date",
+							"value": "2024-01-18",
+							"type": "text"
+						},
+						{
+							"key": "end_date",
+							"value": "2024-03-01",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "gbgb",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/weather",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"weather"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get picture",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/problem.png",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"problem.png"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
