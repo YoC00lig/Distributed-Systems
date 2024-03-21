@@ -18,8 +18,10 @@
 cd homework2
 ```
 
-<p>3. Starts a web server</p>
+<p>3. Starts a web server:</p>
 
 ```
 uvicorn weather:app --reload
 ```
+
+<p>4. Open <a href="http://localhost:8000">http://localhost:8000</a> in your browser.</p>
