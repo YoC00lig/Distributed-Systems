@@ -1,4 +1,4 @@
-from Constants import NUMBER_OF_STORAGE_NODES, CHUNK_SIZE, NUMBER_OF_COPIES, BLUE, RED, ORANGE
+from Constants import NUMBER_OF_STORAGE_NODES, CHUNK_SIZE, NUMBER_OF_COPIES, BLUE, ORANGE, GREEN, PINK
 from StorageNode import StorageNode
 import random
 import logging
@@ -30,7 +30,7 @@ class NameNode():
         print(f"{BLUE}Your artifact is divided into chunks")
         for chunk_id, chunk in enumerate(artifact_chunks):
             self.store_artifact_chunk(name=name, chunk=chunk, chunk_id=chunk_id)
-        print(f"{BLUE}Your artifact's chunks are distributed into storage nodes")
+        print(f"{GREEN}Your artifact is successfully uploaded")
 
     def update_artifact(self, name : str, new_content : str) -> None:
         if name not in self.artifacts:
@@ -53,12 +53,12 @@ class NameNode():
                 self.storage_nodes[storage_node_id].delete_chunk.remote(name, chunk_id)
         for chunk_id in chunks_to_remove:
             self.artifacts[name].pop(chunk_id)
-        print(f"{BLUE}Artifact successfully updated")
+        print(f"{GREEN}Artifact successfully updated")
 
     def get_artifact(self, name : str) -> str:
         if name not in self.artifacts: 
             print(f"{ORANGE}Cannot get the artifact - artifact with the given name was not found.")
-            return 
+            return ""
         content = ""
         for chunk_id, storages in self.artifacts[name].items():
             content += ray.get(self.storage_nodes[storages[0]].get_chunk.remote(name, chunk_id))
@@ -72,3 +72,20 @@ class NameNode():
 
         for storage_node in self.storage_nodes.values():
                storage_node.delete_artifact.remote(name)
+        print(f"{GREEN}Artifact successfully deleted")
+
+    def list_status(self) -> None:
+        print(f"{PINK}LIST OF ARTIFACTS: \n")
+        print(f"{PINK}----------------------------------")
+        artifacts = ""
+        for artifact_name, chunks in self.artifacts.items():
+            artifacts += f"{artifact_name} : {chunks}\n"
+        artifacts += f"\n"
+        print (artifacts)
+        print(f"{PINK}----------------------------------")
+
+        chunks_for_each_storage = []
+        for storage_node in self.storage_nodes.values():
+            chunks_for_each_storage.append(storage_node.get_to_list.remote())
+        chunks_for_each_storage = ray.get(chunks_for_each_storage)
+        return chunks_for_each_storage

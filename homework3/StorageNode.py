@@ -1,8 +1,6 @@
 import ray
 from Constants import RED
-import logging
-
-logging.basicConfig(level=logging.INFO)
+import os 
 
 @ray.remote
 class StorageNode:
@@ -28,6 +26,9 @@ class StorageNode:
         else:
           print(f"{RED} Cannot get given chunk - not found in StorageNode")
           return None
+        
+    def get_to_list(self):
+          return (os.getpid(), self.chunks)
     
     def delete_artifact(self, name):
         if name not in self.chunks: print(f"{RED}Cannot delete given artifact - artifact with the given name was not found in StorageNode.")
