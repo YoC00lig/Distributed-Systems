@@ -25,3 +25,4 @@ if __name__ == "__main__":
             if len(parsed_input) >= 2:
                 result = ray.get(name_node.get_artifact.remote(parsed_input[1]))
                 print(f"{PINK} NAME: {parsed_input[1]} CONTENT: {result}")
+                

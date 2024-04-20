@@ -23,8 +23,13 @@ class StorageNode:
         if name in self.chunks: self.chunks[name].pop(chunk_id)
         else: print(f"{RED}Cannot delete the chunk from given artifact - artifact with the given name was not found in StorageNode.")
 
-    def get_chunk(self, artifact_name, chunk_id):
-        if artifact_name in self.chunks: return self.chunks[artifact_name][chunk_id]
+    def get_chunk(self, name, chunk_id):
+        if name in self.chunks: return self.chunks[name][chunk_id]
         else:
-          print(f"{RED} Cannot get given chunk - chunk with given id was not found in StorageNode")
+          print(f"{RED} Cannot get given chunk - not found in StorageNode")
           return None
+    
+    def delete_artifact(self, name):
+        if name not in self.chunks: print(f"{RED}Cannot delete given artifact - artifact with the given name was not found in StorageNode.")
+        else: self.chunks.pop(name)
+        

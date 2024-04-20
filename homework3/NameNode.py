@@ -51,7 +51,6 @@ class NameNode():
         for chunk_id in chunks_to_remove:
             for storage_node_id in self.artifacts[name][chunk_id]:
                 self.storage_nodes[storage_node_id].delete_chunk.remote(name, chunk_id)
-
         for chunk_id in chunks_to_remove:
             self.artifacts[name].pop(chunk_id)
         print(f"{BLUE}Artifact successfully updated")
@@ -64,3 +63,12 @@ class NameNode():
         for chunk_id, storages in self.artifacts[name].items():
             content += ray.get(self.storage_nodes[storages[0]].get_chunk.remote(name, chunk_id))
         return content
+    
+    def delete_artifact(self, name : str) -> None:
+        if name not in self.artifacts: 
+            print(f"{ORANGE}Cannot delete the artifact - artifact with the given name was not found.")
+            return 
+        else: self.artifacts.pop(name)
+
+        for storage_node in self.storage_nodes.values():
+               storage_node.delete_artifact.remote(name)
