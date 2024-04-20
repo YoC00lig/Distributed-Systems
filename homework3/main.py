@@ -37,16 +37,10 @@ if __name__ == "__main__":
      ray.shutdown()
      ray.init()
      name_node = NameNode.remote()
-     
      while True:
-
-        user_input = input(f'{DEFAULT}CLIENT: ')
-        if len(user_input) < 1: 
-            continue
-
+        user_input = input(f'{PINK}CLIENT: {DEFAULT}')
+        if len(user_input) < 1: continue
         args = user_input.split(' ')
         command = args[0]
-        if command == 'exit': 
-            break
-        else:
-            handle_operation(command, args)
+        if command == 'exit':  break
+        else: handle_operation(command, args)

@@ -2,3 +2,6 @@
 homework2/secret.env
 homework2/__pycache__/weather.cpython-39.pyc
 homework2/__pycache__/Constants.cpython-39.pyc
+homework3/__pycache__/StorageNode.cpython-39.pyc
+homework3/__pycache__/Constants.cpython-39.pyc
+homework3/__pycache__/NameNode.cpython-39.pyc
