@@ -72,11 +72,7 @@ class NameNode():
         if name not in self.artifacts: 
             print(f"{ORANGE}Cannot get the artifact - artifact with the given name was not found.")
             return ""
-        
-        content = ""
-        for chunk_id, storages in self.artifacts[name].items():
-            content += ray.get(self.storage_nodes[storages[0]].get_chunk.remote(name, chunk_id))
-        return content
+        return "".join(ray.get(self.storage_nodes[storages[0]].get_chunk.remote(name, chunk_id)) for chunk_id, storages in self.artifacts[name].items())
     
     def delete_artifact(self, name : str) -> None:
         if name not in self.artifacts: 
