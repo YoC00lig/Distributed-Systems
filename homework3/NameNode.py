@@ -4,12 +4,17 @@ import random
 import ray
 from typing import List
 
-@ray.remote
+@ray.remote(concurrency_groups={"storage_operations": 1, "update_operations": 1, "remove_operations": 2, "list_operations": 2, "internal_operations": 2})
 class NameNode():
     def __init__(self) -> None:
         self.artifacts = {}  
         self.storage_nodes = {storage_node_id : StorageNode.remote() for storage_node_id in range(NUMBER_OF_STORAGE_NODES)} 
 
+    @ray.method(concurrency_group="remove_operations")
+    def exit(self):
+        ray.actor.exit_actor()
+
+    @ray.method(concurrency_group="internal_operations")
     def store_artifact_chunk(self, name : str, chunk : str, chunk_id : int) -> None:
         """
             Function that assigns a given chunk to the appropriate storage nodes.
@@ -25,6 +30,7 @@ class NameNode():
 
         [self.artifacts[name][chunk_id].append(storage_node_id) for storage_node_id in random_storage_nodes]
 
+    @ray.method(concurrency_group="storage_operations")
     def upload_artifact(self, name : str, content : str) -> None:
         if name in self.artifacts:
             print(f"{ORANGE}Given artifact already exists")
@@ -39,6 +45,7 @@ class NameNode():
 
         print(f"{GREEN}Your artifact is successfully uploaded")
 
+    @ray.method(concurrency_group="internal_operations")
     def clear_not_needed_chunks(self, chunks_to_remove : List, name: str) -> None:
         """
             Function that removes old chunks left after updating the content of the artifact.
@@ -50,6 +57,7 @@ class NameNode():
         for chunk_id in chunks_to_remove:
             self.artifacts[name].pop(chunk_id)
 
+    @ray.method(concurrency_group="update_operations")
     def update_artifact(self, name : str, new_content : str) -> None:
         if name not in self.artifacts:
             print(f"{ORANGE}Cannot update the artifact - artifact with the given name was not found.")
@@ -68,12 +76,14 @@ class NameNode():
         self.clear_not_needed_chunks(chunks_to_remove=[chunk_id for chunk_id in self.artifacts[name] if chunk_id >= len(artifact_chunks)], name = name)
         print(f"{GREEN}Artifact successfully updated")
 
+    @ray.method(concurrency_group="list_operations")
     def get_artifact(self, name : str) -> str:
         if name not in self.artifacts: 
             print(f"{ORANGE}Cannot get the artifact - artifact with the given name was not found.")
             return ""
         return "".join(ray.get(self.storage_nodes[storages[0]].get_chunk.remote(name, chunk_id)) for chunk_id, storages in self.artifacts[name].items())
     
+    @ray.method(concurrency_group="remove_operations")
     def delete_artifact(self, name : str) -> None:
         if name not in self.artifacts: 
             print(f"{ORANGE}Cannot delete the artifact - artifact with the given name was not found.")
@@ -81,9 +91,10 @@ class NameNode():
         else: self.artifacts.pop(name)
 
         for storage_node in self.storage_nodes.values():
-               storage_node.delete_artifact.remote(name)
+               storage_node.delete_artifact_.remote(name)
         print(f"{GREEN}Artifact successfully deleted")
 
+    @ray.method(concurrency_group="list_operations")
     def list_all(self) -> None:
         print(f"{PINK}LIST OF ARTIFACTS: \n")
         print(f"{PINK}----------------------------------")
