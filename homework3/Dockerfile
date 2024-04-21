@@ -2,7 +2,7 @@ FROM python:3.9
 
 WORKDIR /app
 
-COPY Distributed-Systems/homework3/ .
+COPY . .
 
 RUN pip install ray
 
