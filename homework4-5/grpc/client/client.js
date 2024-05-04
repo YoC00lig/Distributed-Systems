@@ -1,7 +1,8 @@
-import { loadPackageDefinition, credentials } from "@grpc/grpc-js";
+import { loadPackageDefinition, credentials, status } from "@grpc/grpc-js";
 import { loadSync } from "@grpc/proto-loader";
 import { createInterface } from "readline";
 import chalk from "chalk";
+import grpc from "@grpc/grpc-js"; 
 
 const PATH_TO_PROTO_FILE =
   "/Users/joannakulig/Desktop/Distributed-Systems/homework4-5/grpc/protos/shopping.proto";
@@ -41,8 +42,8 @@ const displaySaleInfo = (saleData) => {
 };
 
 const handleSaleCall = (call, client, sub) => {
-  let bufferedMessages = []; 
-  
+  let bufferedMessages = [];
+
   call.on("data", (data) => {
     displaySaleInfo(data);
   });
@@ -59,15 +60,19 @@ const handleSaleCall = (call, client, sub) => {
       bufferedMessages.push(data);
     });
 
-    const reconnectInterval = 5000;
-    const reconnect = () => {
-      setTimeout(() => {
-        console.log(chalk.yellow("Attempting to reconnect..."));
-        const newCall = client.subscribe(sub);
-        handleSaleCall(newCall, client, sub);
-      }, reconnectInterval);
-    };
-    reconnect();
+    if (error.code === grpc.status.INVALID_ARGUMENT) {
+      console.error(chalk.yellow("One or more cities do not exist"));
+    } else {
+      const reconnectInterval = 5000;
+      const reconnect = () => {
+        setTimeout(() => {
+          console.log(chalk.yellow("Attempting to reconnect..."));
+          const newCall = client.subscribe(sub);
+          handleSaleCall(newCall, client, sub);
+        }, reconnectInterval);
+      };
+      reconnect();
+    }
   });
 };
 
