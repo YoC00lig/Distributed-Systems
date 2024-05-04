@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package events;
+
+service SaleInformer {
+  rpc Subscribe(SaleSubscription) returns (stream SaleEvent);
+}
+
+message SaleSubscription {
+  repeated string cities = 1;
+  repeated string categories = 2;
+}
+
+message SaleEvent {
+  string city = 1;
+  SaleType sale_type = 2;
+  string shop_name = 3;
+  repeated SaleDetails details = 4;
+}
+
+enum SaleType {
+  DISCOUNT = 0;
+  CLEARANCE = 1;
+  FLASH_SALE = 2;
+}
+
+message SaleDetails {
+  string product_name = 1;
+  float original_price = 2;
+  float sale_price = 3;
+  uint32 end_time = 4;
+}
