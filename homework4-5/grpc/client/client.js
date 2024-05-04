@@ -40,7 +40,9 @@ const displaySaleInfo = (saleData) => {
   console.log(chalk.bold("--------------------"));
 };
 
-const handleSaleCall = (call) => {
+const handleSaleCall = (call, client, sub) => {
+  let bufferedMessages = []; 
+  
   call.on("data", (data) => {
     displaySaleInfo(data);
   });
@@ -52,13 +54,27 @@ const handleSaleCall = (call) => {
       return;
     }
     console.error(chalk.red(`Connection error: ${error.message}`));
+
+    call.on("data", (data) => {
+      bufferedMessages.push(data);
+    });
+
+    const reconnectInterval = 5000;
+    const reconnect = () => {
+      setTimeout(() => {
+        console.log(chalk.yellow("Attempting to reconnect..."));
+        const newCall = client.subscribe(sub);
+        handleSaleCall(newCall, client, sub);
+      }, reconnectInterval);
+    };
+    reconnect();
   });
 };
 
 const subscribe = (client, calls, sub) => {
   const call = client.subscribe(sub);
   calls.push(call);
-  handleSaleCall(calls.at(-1));
+  handleSaleCall(calls.at(-1), client, sub);
   console.log(chalk.green(`Subscription [${calls.length - 1}]`));
 };
 
