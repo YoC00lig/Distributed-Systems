@@ -1,6 +1,6 @@
 from generated import shopping_pb2, shopping_pb2_grpc 
 import grpc
-from Constants import SHOPS, CITIES, SALE_TYPES
+from Constants import SHOPS, CITIES, SALE_TYPES, PINK, BLUE, RED
 from concurrent import futures
 import random
 import time
@@ -15,16 +15,16 @@ class SaleInformerServer:
 
     def start(self):
         self.server.start()
-        print("Server started, listening on " + self.port)
+        print(f"{PINK}Server started, listening on " + self.port)
         self.server.wait_for_termination()
 
     def stop(self):
         self.server.stop(0)
 
     def Subscribe(self, request, context):
-        print(f"Subscription (peer: {context.peer()})")
+        print(f"{BLUE}Subscription (peer: {context.peer()})")
         if any(city not in CITIES for city in request.cities):
-            context.set_details(f"One or more cities do not exist")
+            context.set_details(f"{RED}One or more cities do not exist")
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             return
 
@@ -33,8 +33,7 @@ class SaleInformerServer:
                 sale_event = self._generate_sale_event(city)
                 if sale_event:
                     yield sale_event
-                    print(f"Sent notification for {city}, peer: {context.peer()}")
-
+                    print(f"{BLUE}Sent notification for {city}, peer: {context.peer()}")
             time.sleep(random.randint(5, 15))
 
     def _generate_sale_event(self, city):
