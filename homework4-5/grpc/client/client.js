@@ -1,4 +1,4 @@
-import { loadPackageDefinition, credentials } from "@grpc/grpc-js";
+import { loadPackageDefinition, credentials} from "@grpc/grpc-js";
 import { loadSync } from "@grpc/proto-loader";
 import { createInterface } from "readline";
 import chalk from "chalk";
@@ -63,7 +63,6 @@ const handleSaleCall = (call, sub) => {
           console.log(chalk.yellow("Attempting to reconnect..."));
           const newCall = client.subscribe(sub);
           handleSaleCall(newCall, sub);
-          registerCommandHandler();
         }, reconnectInterval);
       };
       reconnect();
@@ -101,6 +100,7 @@ const handleCommand = (line) => {
     cancel: () => {
       const index = parseInt(args[0]);
       cancelSubscription(index);
+      return;
     },
     default: () => {
       console.error(chalk.yellow("Given command is invalid!"));
