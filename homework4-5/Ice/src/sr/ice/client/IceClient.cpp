@@ -1,38 +1,54 @@
 #include <Ice/Ice.h>
-#include "calculator.h"
+#include "calculator.cpp"
 
-using namespace Demo;
 using namespace std;
+using namespace Demo;
+using namespace Ice;
 
 int main(int argc, char* argv[]) {
     int status = 0;
-    Ice::CommunicatorPtr communicator;
+    CommunicatorPtr communicator;
 
     try {
-        // Inicjalizacja Ice communicatora
         communicator = Ice::initialize(argc, argv);
 
-        // Uzyskanie referencji do obiektu zdalnego na podstawie linii konfiguracyjnej
-        Ice::ObjectPrx base = communicator->stringToProxy("calc11:tcp -h 127.0.0.1 -p 10000 -z");
+        auto base = communicator->stringToProxy("calc/calc11:tcp -h 127.0.0.1 -p 10000");
+        auto calc = Ice::checkedCast<Ice::ObjectPrx>(base);
 
-        // Rzutowanie referencji do interfejsu Calc
-        CalcPrx calc = CalcPrx::uncheckedCast(base);
-        if (!calc) {
-            throw "Invalid proxy";
+        try
+        {
+            std::vector<Ice::Byte> inParams, outParams;
+
+            Ice::OutputStream out(communicator);
+            out.startEncapsulation();
+            int x = 100, y = -1;
+            out.write(x);
+            out.write(y);
+            out.endEncapsulation();
+            out.finished(inParams);
+
+            if(calc->ice_invoke("add", Ice::OperationMode::Idempotent, inParams, outParams))
+            {
+                InputStream in(communicator, outParams);
+                in.startEncapsulation();
+                int result;
+                in.read(result);
+                in.endEncapsulation();
+                cout << result << endl;
+            }
+            else
+            {
+                cout << "UNKNOWN OPERATION" << endl;
+            }
         }
-
-        // Wywołanie zdalnych operacji
-        long resultAdd = calc->add(7, 8);
-        long resultSubtract = calc->subtract(10, 5);
-
-        cout << "Result of addition: " << resultAdd << endl;
-        cout << "Result of subtraction: " << resultSubtract << endl;
+        catch(const Ice::LocalException& ex)
+        {
+            cerr << ex << endl;
+            status = 1;
+        }
 
     } catch (const Ice::Exception& ex) {
         cerr << ex << endl;
-        status = 1;
-    } catch (const char* msg) {
-        cerr << "Error: " << msg << endl;
         status = 1;
     }
 
@@ -47,3 +63,4 @@ int main(int argc, char* argv[]) {
 
     return status;
 }
+
