@@ -1,6 +1,7 @@
 <h1>💛 System for the Orthopedic Center</h1>
 <p>We are managing an orthopedic department in a hospital with three types of users: Doctors, Technicians, and Administrators. Doctors order tests and receive results asynchronously. Technicians, each capable of performing two types of tests (e.g., knee, hip), accept test orders and send back results to the ordering doctor. If multiple technicians can perform the same test, only one handles each request. Administrators log all activities and can send messages to everyone. The hospital treats hip, knee, and elbow injuries.</p>
 
+<h1>💛 Users</h1>
 <p><b>(Remember to provide the correct path to the file on your computer in the commands below.)</b></p>
 <h2>👨‍💻 Administrator</h2>
 <p>To compile Administrator: </p>
