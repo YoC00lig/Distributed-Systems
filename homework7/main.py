@@ -26,7 +26,7 @@ def stop_application():
         print("Application stopped.")
 
 def display_children_count(children):
-    print(f"Current number of children: {len(children)}")
+    print(f"\nCurrent number of children: {len(children)}")
 
 def watch_node(event):
     if event.type == EventType.CREATED:
