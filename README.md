@@ -7,4 +7,5 @@
   <li> <a href="https://github.com/YoC00lig/Distributed-Systems/tree/main/homework4-5/ICE">lab04</a> - Dynamic Invocation - Zeroc-ICE 4️⃣.5️⃣</li>
     <li> <a href="https://github.com/YoC00lig/Distributed-Systems/tree/main/homework4-5/grpc">lab05</a> - Discount Event Subscription Service - gRPC  🔟 </li>
   <li> <a href="https://github.com/YoC00lig/Distributed-Systems/tree/main/homework6">lab06</a> - System for the Orthopedic Center - RabbitMQ 🔟 </li>
+    <li> <a href="https://github.com/YoC00lig/Distributed-Systems/tree/main/homework7">lab07</a> - Zokeeper GUI Manager App - Zokeeper </li>
 </ul>
