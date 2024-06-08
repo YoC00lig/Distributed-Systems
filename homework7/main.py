@@ -33,9 +33,15 @@ def display_message(message):
     log_text.insert(tk.END, message + '\n')
     log_text.yview(tk.END)
 
-def display_children_count(children):
-    print(f"Updating number of children: {len(children)}")  
-    children_count.set(f"Number of Children: {len(children)}")
+def display_children_count():
+    try:
+        children = zk.get_children('/a')
+        children_count.set(f"Number of Children: {len(children)}")
+    except NoNodeError:
+        pass  
+    except Exception as e:
+        print(f"Error while getting children count: {e}")
+
 
 def watch_node(event):
     if event.type == EventType.CREATED:
@@ -92,14 +98,13 @@ zk.start()
 def watch_a(data, stat, event):
     if event:
         watch_node(event)
+        display_children_count()
 
-def children_watch_callback(children):
-    display_children_count(children)
+def update_children_count():
+    display_children_count()
+    root.after(5000, update_children_count) 
 
-try:
-    children_watch = ChildrenWatch(zk, '/a', func=children_watch_callback)
-except NoNodeError:
-    print("Node '/a' does not exist. Children watch is not set.")
+update_children_count()
 
 try:
     root.mainloop()
