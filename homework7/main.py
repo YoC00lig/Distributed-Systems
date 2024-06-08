@@ -42,7 +42,6 @@ def display_children_count():
     except Exception as e:
         print(f"Error while getting children count: {e}")
 
-
 def watch_node(event):
     if event.type == EventType.CREATED:
         print("Node '/a' created.")
@@ -61,9 +60,11 @@ def display_tree(path, level=0):
     except NoNodeError:
         return f"Node '{path}' does not exist.\n"
 
-def on_tree_command():
+def update_tree():
     tree = display_tree('/a')
     display_message(tree)
+    display_children_count()  
+    root.after(5000, update_tree)  
 
 def on_quit_command():
     root.quit()
@@ -82,15 +83,6 @@ children_label.pack()
 log_text = scrolledtext.ScrolledText(frame, width=60, height=20, wrap=tk.WORD)
 log_text.pack()
 
-button_frame = tk.Frame(root)
-button_frame.pack(pady=10)
-
-tree_button = tk.Button(button_frame, text="Display Tree", command=on_tree_command)
-tree_button.pack(side=tk.LEFT, padx=5)
-
-quit_button = tk.Button(button_frame, text="Quit", command=on_quit_command)
-quit_button.pack(side=tk.LEFT, padx=5)
-
 zk = KazooClient(hosts='127.0.0.1:2181')
 zk.start()
 
@@ -98,14 +90,8 @@ zk.start()
 def watch_a(data, stat, event):
     if event:
         watch_node(event)
-        display_children_count()
 
-def update_children_count():
-    display_children_count()
-    root.after(5000, update_children_count) 
-
-update_children_count()
-
+update_tree() 
 try:
     root.mainloop()
 except KeyboardInterrupt:
