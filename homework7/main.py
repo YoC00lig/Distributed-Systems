@@ -92,6 +92,10 @@ def watch_a(data, stat, event):
         watch_node(event)
 
 update_tree() 
+
+quit_button = tk.Button(root, text="Quit", command=on_quit_command)
+quit_button.pack(side=tk.BOTTOM)
+
 try:
     root.mainloop()
 except KeyboardInterrupt:
