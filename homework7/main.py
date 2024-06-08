@@ -4,6 +4,7 @@ import subprocess
 from kazoo.client import KazooClient
 from kazoo.recipe.watchers import ChildrenWatch
 from kazoo.protocol.states import EventType
+from kazoo.exceptions import NoNodeError
 
 if len(sys.argv) != 2:
     print("Usage: python main.py <path_to_graphical_application>")
@@ -30,10 +31,10 @@ def display_children_count(children):
 
 def watch_node(event):
     if event.type == EventType.CREATED:
-        print("Node 'a' created.")
+        print("Node '/a' created.")
         start_application()
     elif event.type == EventType.DELETED:
-        print("Node 'a' deleted.")
+        print("Node '/a' deleted.")
         stop_application()
 
 zk = KazooClient(hosts='127.0.0.1:2181')
@@ -44,17 +45,23 @@ def watch_a(data, stat, event):
     if event:
         watch_node(event)
 
-children_watch = ChildrenWatch(zk, '/a', func=display_children_count)
+try:
+    children_watch = ChildrenWatch(zk, '/a', func=display_children_count)
+except NoNodeError:
+    print("Node '/a' does not exist. Children watch is not set.")
 
 def display_tree(path, level=0):
-    children = zk.get_children(path)
-    print('  ' * level + os.path.basename(path))
-    for child in children:
-        display_tree(os.path.join(path, child), level + 1)
+    try:
+        children = zk.get_children(path)
+        print('  ' * level + os.path.basename(path))
+        for child in children:
+            display_tree(os.path.join(path, child), level + 1)
+    except NoNodeError:
+        print(f"Node '{path}' does not exist.")
 
 try:
     while True:
-        command = input("Enter 'tree' to display the tree structure or 'quit' to exit: ").strip().lower()
+        command = input("Enter 'tree' to display the tree structure or 'quit' to exit: \n").strip().lower()
         if command == 'tree':
             display_tree('/a')
         elif command == 'quit':
