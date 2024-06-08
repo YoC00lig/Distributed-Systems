@@ -5,6 +5,8 @@ from kazoo.client import KazooClient
 from kazoo.recipe.watchers import ChildrenWatch
 from kazoo.protocol.states import EventType
 from kazoo.exceptions import NoNodeError
+import tkinter as tk
+from tkinter import scrolledtext
 
 if len(sys.argv) != 2:
     print("Usage: python main.py <path_to_graphical_application>")
@@ -26,8 +28,14 @@ def stop_application():
         app_process = None
         print("Application stopped.")
 
+def display_message(message):
+    log_text.delete(1.0, tk.END)  
+    log_text.insert(tk.END, message + '\n')
+    log_text.yview(tk.END)
+
 def display_children_count(children):
-    print(f"\nCurrent number of children: {len(children)}")
+    print(f"Updating number of children: {len(children)}")  
+    children_count.set(f"Number of Children: {len(children)}")
 
 def watch_node(event):
     if event.type == EventType.CREATED:
@@ -37,6 +45,46 @@ def watch_node(event):
         print("Node '/a' deleted.")
         stop_application()
 
+def display_tree(path, level=0):
+    try:
+        children = zk.get_children(path)
+        tree_structure = '  ' * level + os.path.basename(path) + '\n'
+        for child in children:
+            tree_structure += display_tree(os.path.join(path, child), level + 1)
+        return tree_structure
+    except NoNodeError:
+        return f"Node '{path}' does not exist.\n"
+
+def on_tree_command():
+    tree = display_tree('/a')
+    display_message(tree)
+
+def on_quit_command():
+    root.quit()
+
+root = tk.Tk()
+root.title("Zookeeper GUI")
+
+frame = tk.Frame(root)
+frame.pack(padx=10, pady=10)
+
+children_count = tk.StringVar()
+children_count.set("Number of Children: 0")
+children_label = tk.Label(frame, textvariable=children_count)
+children_label.pack()
+
+log_text = scrolledtext.ScrolledText(frame, width=60, height=20, wrap=tk.WORD)
+log_text.pack()
+
+button_frame = tk.Frame(root)
+button_frame.pack(pady=10)
+
+tree_button = tk.Button(button_frame, text="Display Tree", command=on_tree_command)
+tree_button.pack(side=tk.LEFT, padx=5)
+
+quit_button = tk.Button(button_frame, text="Quit", command=on_quit_command)
+quit_button.pack(side=tk.LEFT, padx=5)
+
 zk = KazooClient(hosts='127.0.0.1:2181')
 zk.start()
 
@@ -45,27 +93,16 @@ def watch_a(data, stat, event):
     if event:
         watch_node(event)
 
+def children_watch_callback(children):
+    display_children_count(children)
+
 try:
-    children_watch = ChildrenWatch(zk, '/a', func=display_children_count)
+    children_watch = ChildrenWatch(zk, '/a', func=children_watch_callback)
 except NoNodeError:
     print("Node '/a' does not exist. Children watch is not set.")
 
-def display_tree(path, level=0):
-    try:
-        children = zk.get_children(path)
-        print('  ' * level + os.path.basename(path))
-        for child in children:
-            display_tree(os.path.join(path, child), level + 1)
-    except NoNodeError:
-        print(f"Node '{path}' does not exist.")
-
 try:
-    while True:
-        command = input("Enter 'tree' to display the tree structure or 'quit' to exit: \n").strip().lower()
-        if command == 'tree':
-            display_tree('/a')
-        elif command == 'quit':
-            break
+    root.mainloop()
 except KeyboardInterrupt:
     pass
 finally:
