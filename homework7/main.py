@@ -9,9 +9,10 @@ from kazoo.protocol.states import EventType
 from kazoo.exceptions import NoNodeError
 
 class ZookeeperApp:
-    def __init__(self, app_path):
+    def __init__(self, app_path, zookeeper_hosts):
         self.app_path = app_path
         self.app_process = None
+        self.zookeeper_hosts = zookeeper_hosts
 
         self.root = tk.Tk()
         self.root.title("Zookeeper GUI")
@@ -27,7 +28,7 @@ class ZookeeperApp:
         self.log_text = scrolledtext.ScrolledText(self.frame, width=60, height=20, wrap=tk.WORD)
         self.log_text.pack()
 
-        self.zk = KazooClient(hosts='127.0.0.1:2181')
+        self.zk = KazooClient(hosts=self.zookeeper_hosts)
         self.zk.start()
 
         @self.zk.DataWatch('/a')
@@ -96,10 +97,12 @@ class ZookeeperApp:
         self.stop_application()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python main.py <path_to_graphical_application>")
+    if len(sys.argv) != 3:
+        print("Usage: python main.py <path_to_graphical_application> <zookeeper_port>")
         sys.exit(1)
 
     app_path = sys.argv[1]
-    app = ZookeeperApp(app_path)
+    zookeeper_port = sys.argv[2]
+    zookeeper_hosts = f'127.0.0.1:{zookeeper_port}'
+    app = ZookeeperApp(app_path, zookeeper_hosts)
     app.root.mainloop()
